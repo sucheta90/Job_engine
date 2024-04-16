@@ -41,3 +41,4 @@ export function checkSignupFormInput(name, value) {
       return tempVal;
   }
 }
+

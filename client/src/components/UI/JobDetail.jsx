@@ -3,11 +3,12 @@
 import Card from "react-bootstrap/Card";
 import Button from "react-bootstrap/Button";
 import { useEffect, useState } from "react";
-
-// import axios from "axios";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import axios from "axios";
 
 export default function JobDetail(props) {
-  const { handleCloseDetails, job } = props;
+  const { handleCloseDetails, job, showJobApplicationForm } = props;
   const [experince, setExperience] = useState("");
 
   useEffect(() => {
@@ -34,9 +35,39 @@ export default function JobDetail(props) {
     experienceReq(job);
   }, [job]);
 
+  const applyToAJob = (e) => {
+    e.preventDefault();
+    const data = axios
+      .put(`api/company/${job.company_id}/job/${job.id}/application`)
+      .then((data) => {
+        if (!data.status === 200) {
+          toast.error("Could not complete request");
+          throw Error({ message: "Could not complete request" });
+        }
+        toast.success("Applied to the job successfully");
+        return data;
+      })
+      .catch((error) => {
+        console.log("Could not complete request", error);
+      });
+  };
+
   return (
     <div className="p-3">
       <h2 className="mb-3">Job Details</h2>
+      <ToastContainer
+        position="top-right"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="colored"
+        transition:Bounce
+      />
       <Card
         data-id={job.id}
         style={{ boxShadow: "-3px 5px 8px grey" }}
@@ -86,7 +117,11 @@ export default function JobDetail(props) {
             <b>Expiry Date</b>
           </Card.Text>
 
-          <Button variant="primary" className="mr-3">
+          <Button
+            variant="primary"
+            className="mr-3"
+            onClick={showJobApplicationForm}
+          >
             Apply
           </Button>
           <Button onClick={handleCloseDetails}>Back to Jobs List</Button>
